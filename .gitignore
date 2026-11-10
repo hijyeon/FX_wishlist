@@ -1,0 +1,25 @@
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+venv/
+
+# Database
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+
+# Uploaded images
+uploads/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Test cache
+.pytest_cache/

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#FAFBE4">
+    <meta name="description" content="해외 쇼핑 위시리스트와 원화 환산 가격 기록을 한곳에서 관리하세요.">
+    <title>FX Wishlist</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="#/" aria-label="FX Wishlist 홈">
+          <span class="brand-mark" aria-hidden="true">♡</span>
+          <span>FX Wishlist</span>
+        </a>
+        <a class="header-link" href="#/">내 위시리스트 <span aria-hidden="true">↗</span></a>
+      </header>
+      <main id="app" tabindex="-1">
+        <div class="loading-state" role="status"><span class="spinner"></span>위시리스트를 불러오는 중이에요…</div>
+      </main>
+      <footer class="site-footer">좋아하는 물건의 가격을 차분히 지켜봐요 <span aria-hidden="true">✿</span></footer>
+    </div>
+  </body>
+</html>
