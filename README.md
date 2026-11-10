@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FX tracker data layer
 
 This MVP contains Frankfurter exchange-rate collection/preprocessing, SQLite persistence, and a FastAPI product CRUD API. SQLite access continues to use the standard library. FastAPI and Pydantic handle the HTTP API and request validation.
@@ -64,3 +65,28 @@ python -m unittest discover -s fx_tracker/tests -v
 ```
 
 Tests use a mocked HTTP opener, a small in-process ASGI test client, and temporary SQLite databases; they do not call the live API or create the default project database.
+=======
+# FX Wishlist
+
+환율 변동에 따른 해외직구 상품의 원화 가격을
+확인할 수 있는 위시리스트 웹 서비스입니다.
+
+## 주요 기능
+- 상품 등록, 조회, 수정, 삭제
+- Frankfurter API를 통한 환율 데이터 수집
+- 환율 기반 원화 가격 계산
+- 상품별 가격 변동 그래프
+
+## 기술 스택
+- Backend: Python, FastAPI
+- Database: SQLite
+- Data Processing: Pandas
+- Frontend: HTML, CSS, JavaScript
+
+## 실행 방법
+1. 저장소 클론
+2. 가상환경 생성 및 활성화
+3. pip install -r requirements.txt
+4. FastAPI 서버 실행
+5. 로컬 주소로 접속
+>>>>>>> b9c9df42db74aa6f9412fb6d3088baf553367316
