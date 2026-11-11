@@ -242,16 +242,18 @@ def record_product_price(
         from .pricing import calculate_krw_price
 
         converted_price = calculate_krw_price(local_price, exchange_rate)
+        # 실제 API 환율 기준일을 가격 기록 날짜로 사용
+        actual_rate_date = date.fromisoformat(rate_row["rate_date"])
         cursor = connection.execute(
             """INSERT INTO price_history
                (product_id, exchange_rate_id, history_date, price_used, exchange_rate_used,
                 converted_price, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?)
                ON CONFLICT(product_id, history_date) DO NOTHING""",
-            (product_id, rate_row["id"], history_date.isoformat(), str(local_price),
-             str(exchange_rate), str(converted_price), datetime.now(timezone.utc).isoformat()),
+            (product_id, rate_row["id"], actual_rate_date.isoformat(), str(local_price),
+            str(exchange_rate), str(converted_price), datetime.now(timezone.utc).isoformat()),
         )
-        saved = _read_price_history_row(connection, product_id, history_date)
+        saved = _read_price_history_row(connection, product_id, actual_rate_date)
         return saved, cursor.rowcount == 1
 
 

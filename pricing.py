@@ -39,10 +39,9 @@ def calculate_percent_change(reference: Decimal | None, current: Decimal) -> Dec
 
 
 def refresh_product_price(db_path: str | Path, product_id: int, *, history_date: date | None = None):
-    """Save one daily price snapshot using that currency's latest available rate."""
-    # DB 저장 함수는 기록일보다 미래인 환율을 제외하고 가장 최근 환율을 선택합니다.
+    """Save a price snapshot dated by the actual exchange-rate date."""
+    # 오늘을 조회 상한으로 사용하고, 실제 기록 날짜는 DB 함수에서 결정합니다.
     return record_product_price(db_path, product_id, history_date=history_date or date.today())
-
 
 def refresh_all_product_prices(db_path: str | Path, *, history_date: date | None = None) -> dict:
     """Update every product; products without a stored rate are reported as skipped."""
