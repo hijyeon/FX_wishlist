@@ -1,92 +1,211 @@
-<<<<<<< HEAD
-# FX tracker data layer
+# FX Wishlist 💱
 
-This MVP contains Frankfurter exchange-rate collection/preprocessing, SQLite persistence, and a FastAPI product CRUD API. SQLite access continues to use the standard library. FastAPI and Pydantic handle the HTTP API and request validation.
+### 환율 기반 해외 직구 상품 가격 관리 웹 서비스
 
-## Requirements
+FX Wishlist는 해외 직구 상품의 가격을 환율과 연동하여 관리하고, **원화 환산 가격의 변동을 그래프로 확인할 수 있는 웹 서비스**입니다.
 
-- Python 3.10 or newer
-- Internet access when collecting live rates
+해외 쇼핑몰에서 판매하는 상품의 가격은 동일하더라도 환율에 따라 실제 원화 구매 비용이 달라집니다. FX Wishlist는 이러한 가격 변화를 쉽게 확인하고, 해외 상품의 구매 시점을 판단하는 데 도움을 주기 위해 개발되었습니다.
 
-Install the API dependencies with `python -m pip install -r fx_tracker/requirements.txt` from the `Documents/Codex` directory. The exchange-rate client calls Frankfurter v2 `/rate/{base}/KRW` for USD, JPY, CNY, and EUR. The API's `date` is kept as the rate date, including when it is an earlier business day.
+## 1. 프로젝트 개요
 
-## Product API
+| 항목 | 내용 |
+|---|---|
+| 프로젝트명 | FX Wishlist |
+| 개발 형태 | 개인 웹 개발 프로젝트 |
+| 개발 언어 | Python, JavaScript, HTML, CSS |
+| 백엔드 | FastAPI |
+| 데이터베이스 | SQLite |
+| 외부 API | Frankfurter API |
+| 주요 기능 | 환율 조회, 상품 관리, 원화 가격 계산, 가격 변동 시각화 |
 
-From the `Documents/Codex` directory, start the API:
+## 2. 개발 배경 및 목적
 
-```powershell
-python -m uvicorn fx_tracker.main:app --reload
+해외 직구를 이용하면서 상품의 외화 가격뿐 아니라 환율 변동에 따른 실제 구매 비용도 함께 확인할 필요성을 느꼈습니다.
+
+기존에는 해외 상품의 가격과 환율을 각각 확인한 뒤 직접 원화 가격을 계산해야 했습니다.
+
+이러한 불편함을 개선하기 위해 다음과 같은 목표를 설정했습니다.
+
+- 해외 상품을 위시리스트에 등록하고 관리
+- USD, EUR, JPY, CNY 환율 데이터 조회
+- 상품 가격을 원화로 자동 환산
+- 날짜별 가격 이력을 데이터베이스에 저장
+- 가격 변동을 그래프로 시각화
+
+## 3. 주요 기능
+
+### ① 환율 조회
+
+Frankfurter API를 활용하여 주요 통화의 원화 환율을 조회합니다.
+
+지원 통화는 다음과 같습니다.
+
+- USD: 미국 달러
+- EUR: 유로
+- JPY: 일본 엔
+- CNY: 중국 위안
+
+API에서 제공하는 실제 환율 기준일을 활용하며, 환율 데이터가 갱신되지 않은 경우에는 저장된 최신 환율을 사용할 수 있도록 구현했습니다.
+
+### ② 위시리스트 상품 관리
+
+사용자는 해외 쇼핑몰에서 구매를 고려하는 상품을 위시리스트에 등록할 수 있습니다.
+
+등록 정보는 다음과 같습니다.
+
+- 상품명
+- 상품 이미지 URL
+- 기준 통화
+- 상품의 외화 가격
+
+등록된 상품은 메인 화면에서 카드 형태로 확인할 수 있으며, 상품 정보를 조회·수정·삭제할 수 있습니다.
+
+### ③ 원화 가격 자동 계산
+
+등록된 상품의 외화 가격과 해당 통화의 환율을 이용해 원화 가격을 계산합니다.
+
+**원화 환산 가격 = 상품 외화 가격 × 적용 환율**
+
+예를 들어 상품 가격이 100 USD이고 적용 환율이 1,450 KRW/USD라면 원화 환산 가격은 145,000원입니다.
+
+### ④ 가격 변동 그래프
+
+상품 상세 페이지에서 날짜별 원화 환산 가격의 변화를 그래프로 확인할 수 있습니다.
+
+가격 이력은 상품 정보와 환율 데이터를 연결하여 저장하며, 이를 통해 환율 변화에 따른 구매 비용의 변화를 시각적으로 확인할 수 있습니다.
+
+## 4. 기술 스택
+
+| 구분 | 사용 기술 | 활용 목적 |
+|---|---|---|
+| Backend | Python, FastAPI | REST API 및 서버 로직 구현 |
+| Frontend | HTML, CSS, JavaScript | 사용자 인터페이스 구현 |
+| Database | SQLite | 상품·환율·가격 이력 저장 |
+| External API | Frankfurter API | 환율 데이터 수집 |
+| Version Control | Git, GitHub | 소스코드 및 버전 관리 |
+| Development Tool | Visual Studio Code | 개발 환경 |
+
+## 5. 시스템 동작 구조
+
+**외부 환율 API → 백엔드 → 데이터베이스 → 프런트엔드**
+
+1. Frankfurter API에서 환율 데이터를 요청합니다.
+2. FastAPI에서 응답 데이터를 처리하고 SQLite에 저장합니다.
+3. 사용자가 상품을 등록하면 상품 정보가 데이터베이스에 저장됩니다.
+4. 상품의 외화 가격과 적용 환율을 이용해 원화 가격을 계산합니다.
+5. 계산 결과를 가격 이력으로 저장합니다.
+6. 프런트엔드에서 상품 정보와 가격 변동 그래프를 표시합니다.
+
+## 6. 데이터베이스 설계
+
+프로젝트는 SQLite를 사용하며, 주요 테이블은 다음과 같습니다.
+
+| 테이블 | 역할 |
+|---|---|
+| `products` | 상품 정보 저장 |
+| `exchange_rates` | 통화별 날짜별 환율 저장 |
+| `price_history` | 상품별 원화 환산 가격 이력 저장 |
+
+상품과 가격 이력은 상품 ID를 통해 연결되며, 가격 이력과 환율 정보는 환율 ID를 통해 연결됩니다.
+
+## 7. 실행 화면
+
+### 메인 화면
+
+*여기에 메인 화면 캡처 이미지 삽입*
+
+주요 통화의 환율과 등록된 상품 목록을 확인할 수 있습니다.
+
+### 상품 등록 화면
+
+*여기에 상품 등록 화면 캡처 이미지 삽입*
+
+상품명, 이미지 URL, 통화, 가격을 입력하여 위시리스트에 상품을 추가할 수 있습니다.
+
+### 상품 상세 및 가격 변동 그래프
+
+*여기에 가격 변동 그래프 캡처 이미지 삽입*
+
+환율에 따라 변화하는 원화 환산 가격을 날짜별 그래프로 확인할 수 있습니다.
+
+## 8. 실행 방법
+
+### ① 프로젝트 다운로드
+
+```bash
+git clone https://github.com/hijyeon/FX_wishlist.git
+cd FX_wishlist
 ```
 
-Open `http://127.0.0.1:8000/docs` to use Swagger UI. The endpoints are `POST /products`, `GET /products`, `GET /products/{product_id}`, `PUT /products/{product_id}`, and `DELETE /products/{product_id}`. Create and update use `multipart/form-data`; in Swagger, choose an image file in the `image` field. Supported image files are JPEG, PNG, GIF, WebP, and BMP up to 5 MB. File type is checked against the binary signature, and disk names are random UUIDs. The database stores a relative path such as `uploads/<random-name>.png`.
+### ② 가상환경 생성 및 활성화
 
-The default SQLite file is `fx_tracker/data/fx_tracker.sqlite3` and images are written to `fx_tracker/uploads/`. Set `FX_TRACKER_DB` or `FX_TRACKER_UPLOAD_DIR` to override either location. Partial updates keep omitted fields and the current image. Replacing an image removes the old uploaded file after the database update. Deleting a product cascades its price-history rows using the existing foreign key and removes its uploaded image.
-
-## FX Wishlist website
-
-The HTML/CSS/JavaScript frontend is served by the same local FastAPI server. Run `python -m uvicorn fx_tracker.main:app --reload` from `Documents/Codex`, then open `http://127.0.0.1:8000/`. `/docs` remains available for API testing. The first page load reads `/exchange-rates` and `/products`; use **환율·가격 갱신** to call `POST /exchange-rates/refresh`, then `POST /prices/refresh`. This stores live API rates and creates price-history records where rates exist. Chart.js is loaded from jsDelivr, so the chart needs an internet connection; the rest of the frontend uses local files and the same-origin API.
-
-Files are separated by role: `frontend/index.html` provides the page shell, `frontend/styles.css` defines the responsive visual design, and `frontend/app.js` handles navigation, forms, API requests, and Chart.js. Data is loaded with `fetch`, then rendered into the wishlist, detail page, and price chart. Product images are served from `/uploads/{filename}`.
-
-## KRW price history API
-
-- `POST /products/{product_id}/price/refresh`: calculate one product's price and store today's snapshot. Returns `409` when no eligible exchange rate is stored.
-- `POST /prices/refresh`: refresh all products. Products without an eligible rate are listed under `skipped`; no placeholder rate is used.
-- `GET /products/{product_id}/price`: read the latest saved KRW price.
-- `GET /products/{product_id}/price-history`: read snapshots in date order.
-- `GET /products/{product_id}/price-changes`: compare the first snapshot with the latest, and the previous snapshot with the latest. If a baseline is missing or zero, the corresponding percentage is `null`.
-
-The calculation uses the most recent `exchange_rates.rate_date` on or before the snapshot date. `price_history.history_date` is the day the snapshot is recorded; `exchange_rate_date` in responses is joined from the referenced exchange-rate row. The existing `exchange_rate_id` foreign key already preserves this relationship, and the unique `(product_id, history_date)` constraint makes refreshes idempotent for each day, so no schema migration was required.
-
-## Initialize and collect
-
-From the `Documents/Codex` directory:
+Windows PowerShell 기준:
 
 ```powershell
-python -c "from fx_tracker.pipeline import sync_rates; print(sync_rates('fx_tracker/data/fx_tracker.sqlite3'))"
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-The function fetches and validates the complete batch before saving. A failed request or invalid/missing rate aborts the batch; it does not store a placeholder or a partial result. Repeated collection for an already stored currency/date leaves the original observation intact and returns its existing row ID.
+### ③ 필요한 라이브러리 설치
 
-## Read stored rates
+프로젝트에 `requirements.txt`가 있는 경우:
 
-```powershell
-python -c "from fx_tracker.database import get_exchange_rates; print([dict(r) for r in get_exchange_rates('fx_tracker/data/fx_tracker.sqlite3')])"
+```bash
+pip install -r requirements.txt
 ```
 
-Individual functions are available in `fx_tracker.exchange_rates` (`fetch_rate`, `fetch_rates`, `preprocess_rate`) and `fx_tracker.database` (`initialize_database`, `save_exchange_rates`, `get_exchange_rates`, `add_product`, `save_price_history`, `get_price_history`).
+### ④ 서버 실행
 
-## Run tests
+프로젝트의 Python 모듈 구조에 맞게 FastAPI 서버를 실행합니다.
 
-From the `Documents/Codex` directory:
+예를 들어 `main.py`를 직접 실행 모듈로 사용하는 구조라면 다음 명령어를 사용할 수 있습니다.
 
-```powershell
-python -m unittest discover -s fx_tracker/tests -v
+```bash
+python -m uvicorn main:app --reload
 ```
 
-Tests use a mocked HTTP opener, a small in-process ASGI test client, and temporary SQLite databases; they do not call the live API or create the default project database.
-=======
-# FX Wishlist
+서버가 실행되면 브라우저에서 다음 주소로 접속합니다.
 
-환율 변동에 따른 해외직구 상품의 원화 가격을
-확인할 수 있는 위시리스트 웹 서비스입니다.
+```text
+http://127.0.0.1:8000
+```
 
-## 주요 기능
-- 상품 등록, 조회, 수정, 삭제
-- Frankfurter API를 통한 환율 데이터 수집
-- 환율 기반 원화 가격 계산
-- 상품별 가격 변동 그래프
+※ 실제 실행 명령어와 접속 경로는 프로젝트 구조에 맞춰 확인해야 합니다.
 
-## 기술 스택
-- Backend: Python, FastAPI
-- Database: SQLite
-- Data Processing: Pandas
-- Frontend: HTML, CSS, JavaScript
+## 9. 개발 과정에서 해결한 문제
 
-## 실행 방법
-1. 저장소 클론
-2. 가상환경 생성 및 활성화
-3. pip install -r requirements.txt
-4. FastAPI 서버 실행
-5. 로컬 주소로 접속
->>>>>>> b9c9df42db74aa6f9412fb6d3088baf553367316
+### 환율 데이터의 실제 기준일과 저장 날짜 불일치
+
+외부 환율 API의 최신 데이터 날짜와 서버 실행 날짜가 일치하지 않는 문제가 발생했습니다.
+
+이 문제를 해결하기 위해 API에서 제공하는 환율 기준일을 확인하고, 해당 날짜를 기준으로 가격 이력을 관리하도록 로직을 수정했습니다.
+
+### 동일 날짜 데이터 중복 저장 방지
+
+동일한 상품에 대해 같은 날짜의 가격 이력이 중복 저장되지 않도록 SQLite의 UNIQUE 제약조건과 충돌 처리 기능을 활용했습니다.
+
+### 그래프 기능 검증
+
+짧은 개발 기간으로 인해 충분한 가격 이력이 쌓이지 않아, 별도의 시연용 데이터베이스에 가상 환율 데이터를 추가하여 가격 변동 그래프의 동작을 검증했습니다.
+
+시연용 데이터는 실제 환율 데이터와 구분하여 관리했습니다.
+
+## 10. 프로젝트를 통해 배운 점
+
+이번 프로젝트를 통해 Python 기반 백엔드 개발부터 외부 API 연동, 데이터베이스 설계, 프런트엔드와의 데이터 연결까지 하나의 웹 서비스를 구현하는 과정을 경험했습니다.
+
+특히 환율 데이터를 단순히 조회하는 데 그치지 않고, 날짜별로 저장한 뒤 상품 가격과 연결하여 분석 가능한 데이터로 가공하는 과정을 학습했습니다.
+
+또한 개발 과정에서 발생한 데이터 중복 및 날짜 불일치 문제를 해결하며 데이터의 정확성과 일관성을 유지하는 것의 중요성을 이해할 수 있었습니다.
+
+## 11. 향후 개선 방향
+
+- 해외 쇼핑몰 상품 가격 자동 수집
+- 목표 원화 가격 도달 시 알림 기능
+- 가격 및 환율 변동 분석 기능 고도화
+- 다양한 해외 쇼핑몰과 통화 지원
+- 웹 서비스 배포 및 사용자 접근성 개선
+
+---
+
+본 프로젝트는 개인 학습 및 개발 경험을 목적으로 제작되었습니다.
